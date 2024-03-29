@@ -36,14 +36,16 @@ class NumberTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        // Ensuring the button is square depending on its context
-        minimumSize: MaterialStateProperty.all<Size>(const Size(100, 100)), // Example fixed size, adjust as needed
+        minimumSize: MaterialStateProperty.all<Size>(const Size(100, 100)),
+        elevation: MaterialStateProperty.all(5),
+        surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+        shadowColor: MaterialStateProperty.all(Colors.black),
       ),
       child: Text(
         '$number',
         style: const TextStyle(
-          fontSize: 24, // Adjust the font size as per your design
-          color: Colors.white, // Text color
+          fontSize: 24,
+          color: Colors.white,
         ),
       ),
     );
