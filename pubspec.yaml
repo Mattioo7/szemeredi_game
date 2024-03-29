@@ -12,10 +12,14 @@ dependencies:
     sdk: flutter
 
   ffi: ^2.1.2
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  # ffigen
+  ffigen: ^11.0.0
 
   # linters
   flutter_lints: ^2.0.0
@@ -23,3 +27,13 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+ffigen:
+  name: 'SzemerediGameEngine'
+  description: 'Bindings to SzemerediGameEngine'
+  output: 'lib/generated/ffi_bindings.dart'
+  headers:
+    entry-points:
+    - 'game_engine/api.h'
+#    include-directives:
+#    - 'game_engine/api.h'
