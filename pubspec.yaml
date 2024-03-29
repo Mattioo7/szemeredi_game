@@ -31,7 +31,7 @@ flutter:
 ffigen:
   name: 'SzemerediGameEngine'
   description: 'Bindings to SzemerediGameEngine'
-  output: 'lib/generated/ffi_bindings.dart'
+  output: 'lib/utils/ffi_bindings.dart'
   headers:
     entry-points:
     - 'game_engine/api.h'

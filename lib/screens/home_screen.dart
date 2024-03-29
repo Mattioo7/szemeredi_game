@@ -1,7 +1,8 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:szemeredi_game/generated/ffi_bindings.dart';
+import 'package:szemeredi_game/screens/game_screen.dart';
+import 'package:szemeredi_game/utils/ffi_bindings.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +25,17 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Demo'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const GameScreen()),
+            );
+          },
+          child: const Text('Start Game'),
+        ),
       ),
     );
   }

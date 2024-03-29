@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:szemeredi_game/presentation/home_screen.dart';
+import 'package:szemeredi_game/screens/home_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
