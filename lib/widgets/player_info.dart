@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class PlayerInfo extends StatelessWidget {
@@ -37,6 +39,7 @@ class PlayerInfo extends StatelessWidget {
   }
 
   int longestArithSeqLength(List<int> numbers) {
+    numbers.sort();
     if (numbers.length <= 2) {
       return numbers.length;
     }
@@ -60,6 +63,4 @@ class PlayerInfo extends StatelessWidget {
 
     return maxLength;
   }
-
-  int max(int a, int b) => a > b ? a : b;
 }
