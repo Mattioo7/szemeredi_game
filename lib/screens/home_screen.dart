@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const GameScreen()),
+              MaterialPageRoute<GameScreen>(builder: (context) => const GameScreen()),
             );
           },
           child: const Text('Start Game'),

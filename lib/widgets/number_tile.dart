@@ -5,10 +5,12 @@ class NumberTile extends StatelessWidget {
     super.key,
     required this.number,
     required this.colorCode,
+    required this.onPressed,
   });
 
   final int number;
   final int colorCode;
+  final void Function(int number)? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +27,7 @@ class NumberTile extends StatelessWidget {
     }
 
     return ElevatedButton(
-      onPressed: () {
-        // Handle button press
-        print('Tile $number pressed');
-      },
+      onPressed: onPressed != null ? () => onPressed!(number) : null,
       style: ButtonStyle(
         backgroundColor: backgroundColor,
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -40,6 +39,7 @@ class NumberTile extends StatelessWidget {
         elevation: MaterialStateProperty.all(5),
         surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
         shadowColor: MaterialStateProperty.all(Colors.black),
+        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.zero),
       ),
       child: Text(
         '$number',
