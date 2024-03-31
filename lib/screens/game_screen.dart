@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:szemeredi_game/widgets/number_tile.dart';
 import 'package:szemeredi_game/widgets/player_info.dart';
@@ -14,6 +16,27 @@ class _GameScreenState extends State<GameScreen> {
   List<int> selectedNumbersPlayer = [];
   List<int> selectedNumbersComputer = [];
   bool playerTurn = true;
+
+  Future<void> computerTurn() async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+
+    setState(() {
+      final availableNumbers = numbers
+          .where(
+            (number) =>
+                !selectedNumbersPlayer.contains(number) &&
+                !selectedNumbersComputer.contains(number),
+          )
+          .toList();
+
+      if (availableNumbers.isNotEmpty) {
+        final randomNumber =
+            availableNumbers[Random().nextInt(availableNumbers.length)];
+        selectedNumbersComputer.add(randomNumber);
+        playerTurn = !playerTurn;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +73,11 @@ class _GameScreenState extends State<GameScreen> {
                           setState(() {
                             if (playerTurn) {
                               selectedNumbersPlayer.add(number);
-                            } else {
-                              selectedNumbersComputer.add(number);
+                              playerTurn = !playerTurn;
+                              if (!playerTurn) {
+                                computerTurn();
+                              }
                             }
-                            playerTurn = !playerTurn;
                           });
                         },
                 );
