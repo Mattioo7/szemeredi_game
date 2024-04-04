@@ -34,7 +34,11 @@ class _GameScreenState extends State<GameScreen> {
     super.initState();
     final init = gameEngine.api_init();
     log('Init: $init');
-    final setup = gameEngine.api_setup(widget.sequenceLength, widget.numberOfRandomizedNumbers, widget.maxRandomNumber);
+    final setup = gameEngine.api_setup(
+      widget.sequenceLength,
+      widget.numberOfRandomizedNumbers,
+      widget.maxRandomNumber,
+    );
     log('Setup: $setup');
 
     if (init != 0 || setup != 0) {
@@ -42,7 +46,9 @@ class _GameScreenState extends State<GameScreen> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Something went wrong, please try again.')),
+          const SnackBar(
+            content: Text('Something went wrong, please try again.'),
+          ),
         );
       });
     }
@@ -55,18 +61,101 @@ class _GameScreenState extends State<GameScreen> {
   late final SzemerediGameEngine gameEngine;
   late final GameState gameState;
 
-  bool playerTurn = true;
+  bool isPlayerTurn = true;
+  bool isPlay = true;
+
+  Future<void> playerTurn(int number) async {
+    setState(() {
+      if (isPlayerTurn && isPlay) {
+        gameEngine.api_move(number);
+        gameState.white.add(number);
+        isPlayerTurn = !isPlayerTurn;
+        if (!isPlayerTurn) {
+          computerTurn();
+        }
+      }
+    });
+
+    final whoWon = gameEngine.api_check_who_won();
+    if (whoWon != PLAY) {
+      log('whoWon: $whoWon');
+      isPlay = false;
+
+      if (whoWon == BLACK) {
+        await showDialog<AlertDialog>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Congratulations!'),
+              content: const Text('You won!'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        ).then(
+          (value) => {
+            Navigator.pop(context),
+            gameEngine.api_clean(),
+            gameEngine.api_finish(),
+          },
+        );
+        return;
+      }
+    }
+  }
 
   Future<void> computerTurn() async {
+    // TODO: delete
     await Future<void>.delayed(const Duration(seconds: 1));
 
     setState(() {
-      final pickedNumber = gameEngine.api_think();
-      log('Computer picked: $pickedNumber');
-      gameEngine.api_move(pickedNumber);
-      gameState.black.add(pickedNumber);
-      playerTurn = !playerTurn;
+      if (isPlay) {
+        final pickedNumber = gameEngine.api_think();
+        log('Computer picked: $pickedNumber');
+        gameEngine.api_move(pickedNumber);
+        gameState.black.add(pickedNumber);
+        isPlayerTurn = !isPlayerTurn;
+      }
     });
+
+    final whoWon = gameEngine.api_check_who_won();
+    if (whoWon != PLAY) {
+      log('whoWon: $whoWon');
+      isPlay = false;
+
+      if (whoWon == WHITE) {
+        await showDialog<AlertDialog>(
+          context: context, // FIXME
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Ahhh!'),
+              content: const Text('Computer won!'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        ).then(
+          (value) => {
+            Navigator.pop(context),
+            gameEngine.api_clean(),
+            gameEngine.api_finish(),
+          },
+        );
+        return;
+      }
+    }
   }
 
   @override
@@ -98,20 +187,7 @@ class _GameScreenState extends State<GameScreen> {
                 return NumberTile(
                   number: gameState.set[index],
                   colorCode: colorCode,
-                  onPressed: isSelected
-                      ? null
-                      : (number) {
-                          setState(() {
-                            if (playerTurn) {
-                              gameState.white.add(number);
-                              gameEngine.api_move(number);
-                              playerTurn = !playerTurn;
-                              if (!playerTurn) {
-                                computerTurn();
-                              }
-                            }
-                          });
-                        },
+                  onPressed: isSelected ? null : playerTurn,
                 );
               },
             ),
