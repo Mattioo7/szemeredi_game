@@ -1,40 +1,71 @@
-import 'dart:math';
+import 'dart:developer';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:szemeredi_game/models/game_state.dart';
+import 'package:szemeredi_game/utils/ffi_bindings.dart';
 import 'package:szemeredi_game/widgets/number_tile.dart';
 import 'package:szemeredi_game/widgets/player_info.dart';
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key});
+  const GameScreen({
+    super.key,
+    required this.sequenceLength,
+    required this.numberOfRandomizedNumbers,
+    required this.maxRandomNumber,
+  });
+
+  final int sequenceLength;
+  final int numberOfRandomizedNumbers;
+  final int maxRandomNumber;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
 }
 
 class _GameScreenState extends State<GameScreen> {
-  final List<int> numbers = List.generate(20, (index) => index + 1);
-  List<int> selectedNumbersPlayer = [];
-  List<int> selectedNumbersComputer = [];
+  _GameScreenState() {
+    dylib = DynamicLibrary.open('game_engine/libengine.so');
+    gameEngine = SzemerediGameEngine(dylib);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final init = gameEngine.api_init();
+    log('Init: $init');
+    final setup = gameEngine.api_setup(widget.sequenceLength, widget.numberOfRandomizedNumbers, widget.maxRandomNumber);
+    log('Setup: $setup');
+
+    if (init != 0 || setup != 0) {
+      Navigator.pop(context);
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Something went wrong, please try again.')),
+        );
+      });
+    }
+
+    final state = gameEngine.api_get_state();
+    gameState = GameState.fromState(state);
+  }
+
+  late final DynamicLibrary dylib;
+  late final SzemerediGameEngine gameEngine;
+  late final GameState gameState;
+
   bool playerTurn = true;
 
   Future<void> computerTurn() async {
     await Future<void>.delayed(const Duration(seconds: 1));
 
     setState(() {
-      final availableNumbers = numbers
-          .where(
-            (number) =>
-                !selectedNumbersPlayer.contains(number) &&
-                !selectedNumbersComputer.contains(number),
-          )
-          .toList();
-
-      if (availableNumbers.isNotEmpty) {
-        final randomNumber =
-            availableNumbers[Random().nextInt(availableNumbers.length)];
-        selectedNumbersComputer.add(randomNumber);
-        playerTurn = !playerTurn;
-      }
+      final pickedNumber = gameEngine.api_think();
+      log('Computer picked: $pickedNumber');
+      gameEngine.api_move(pickedNumber);
+      gameState.black.add(pickedNumber);
+      playerTurn = !playerTurn;
     });
   }
 
@@ -53,26 +84,27 @@ class _GameScreenState extends State<GameScreen> {
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
               ),
-              itemCount: numbers.length,
+              itemCount: gameState.set.length,
               itemBuilder: (context, index) {
-                final number = numbers[index];
-                final colorCode = selectedNumbersPlayer.contains(number)
+                final number = gameState.set[index];
+                final colorCode = gameState.white.contains(number)
                     ? 1
-                    : selectedNumbersComputer.contains(number)
+                    : gameState.black.contains(number)
                         ? 2
                         : 0;
-                final isSelected = selectedNumbersPlayer.contains(number) ||
-                    selectedNumbersComputer.contains(number);
+                final isSelected = gameState.white.contains(number) ||
+                    gameState.black.contains(number);
 
                 return NumberTile(
-                  number: numbers[index],
+                  number: gameState.set[index],
                   colorCode: colorCode,
                   onPressed: isSelected
                       ? null
                       : (number) {
                           setState(() {
                             if (playerTurn) {
-                              selectedNumbersPlayer.add(number);
+                              gameState.white.add(number);
+                              gameEngine.api_move(number);
                               playerTurn = !playerTurn;
                               if (!playerTurn) {
                                 computerTurn();
@@ -91,11 +123,13 @@ class _GameScreenState extends State<GameScreen> {
               children: [
                 PlayerInfo(
                   playerName: 'Player',
-                  selectedNumbers: selectedNumbersPlayer,
+                  selectedNumbers: gameState.white,
+                  color: Colors.blue,
                 ),
                 PlayerInfo(
                   playerName: 'Computer',
-                  selectedNumbers: selectedNumbersComputer,
+                  selectedNumbers: gameState.black,
+                  color: Colors.red,
                 ),
               ],
             ),

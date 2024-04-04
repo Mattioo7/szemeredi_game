@@ -7,10 +7,12 @@ class PlayerInfo extends StatelessWidget {
     super.key,
     required this.playerName,
     required this.selectedNumbers,
+    required this.color,
   });
 
   final String playerName;
   final List<int> selectedNumbers;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +21,7 @@ class PlayerInfo extends StatelessWidget {
       height: 100,
       width: 100,
       decoration: BoxDecoration(
-        color: Colors.blue,
-        // Consider varying the color by player or other criteria
+        color: color,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Center(
