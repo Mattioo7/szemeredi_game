@@ -19,6 +19,9 @@ typedef unsigned long long U64;
 #define DRAW  2
 #define PLAY  3
 
+#define INT_MIN (-1e9)
+#define INT_MAX (+1e9)
+#define MAX_DEPTH 5
 typedef struct
 {
     U64 set[MEM_SIZE];
