@@ -1,8 +1,5 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:szemeredi_game/screens/game_screen.dart';
-import 'package:szemeredi_game/utils/ffi_bindings.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,13 +9,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  _HomeScreenState() {
-    dylib = DynamicLibrary.open('game_engine/libengine.so');
-    gameEngine = SzemerediGameEngine(dylib);
-  }
-
-  late final DynamicLibrary dylib;
-  late final SzemerediGameEngine gameEngine;
+  _HomeScreenState();
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _sequenceLengthController = TextEditingController();
@@ -37,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter Demo'),
+        title: const Text('Szemeredi Game Demo'),
       ),
       body: Center(
         child: Padding(
@@ -55,6 +46,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       labelText: 'Length of Desired Sequence',
                     ),
                     keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (int.tryParse(value ?? '') == null) {
+                        return 'Please enter a valid number';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
@@ -63,6 +60,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       labelText: 'Number of Randomized Numbers',
                     ),
                     keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (int.tryParse(value ?? '') == null) {
+                        return 'Please enter a valid number';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
@@ -71,20 +74,31 @@ class _HomeScreenState extends State<HomeScreen> {
                       labelText: 'Maximal Number for Randomization',
                     ),
                     keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (int.tryParse(value ?? '') == null) {
+                        return 'Please enter a valid number';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      // Add validation or processing logic here if needed
+                      if (!(_formKey.currentState?.validate() ?? true)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Please enter valid numbers')),
+                        );
+                        return;
+                      }
+
                       Navigator.push(
                         context,
                         MaterialPageRoute<GameScreen>(
                           builder: (context) => GameScreen(
-                            sequenceLength: int.parse(_sequenceLengthController.text),
-                            numberOfRandomizedNumbers: int.parse(_numberOfRandomizedNumbersController.text),
-                            maxRandomNumber: int.parse(_maxRandomNumberController.text),
+                            sequenceLength: int.tryParse(_sequenceLengthController.text) ?? 0,
+                            numberOfRandomizedNumbers: int.tryParse(_numberOfRandomizedNumbersController.text) ?? 0,
+                            maxRandomNumber: int.tryParse(_maxRandomNumberController.text) ?? 0,
                           ),
-                          // Pass the settings to your game screen if needed
                         ),
                       );
                     },

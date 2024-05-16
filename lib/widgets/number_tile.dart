@@ -22,6 +22,8 @@ class NumberTile extends StatelessWidget {
         backgroundColor = MaterialStateProperty.all<Color>(Colors.blue);
       case 2:
         backgroundColor = MaterialStateProperty.all<Color>(Colors.red);
+      case 3:
+        backgroundColor = MaterialStateProperty.all<Color>(Colors.transparent);
       default:
         backgroundColor = MaterialStateProperty.all<Color>(Colors.grey);
     }
@@ -38,14 +40,14 @@ class NumberTile extends StatelessWidget {
         minimumSize: MaterialStateProperty.all<Size>(const Size(100, 100)),
         elevation: MaterialStateProperty.all(5),
         surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-        shadowColor: MaterialStateProperty.all(Colors.black),
+        shadowColor: colorCode != 3 ? MaterialStateProperty.all(Colors.black) : MaterialStateProperty.all(Colors.transparent),
         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.zero),
       ),
       child: Text(
         '$number',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 24,
-          color: Colors.white,
+          color: colorCode != 3 ? Colors.white : Colors.black,
         ),
       ),
     );
