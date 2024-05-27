@@ -3,6 +3,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:szemeredi_game/models/game_state.dart';
+import 'package:szemeredi_game/models/game_status_enum.dart';
 import 'package:szemeredi_game/utils/ffi_bindings.dart';
 import 'package:szemeredi_game/widgets/number_tile.dart';
 import 'package:szemeredi_game/widgets/player_info.dart';
@@ -78,7 +79,7 @@ class _GameScreenState extends State<GameScreen> {
   Future<void> computerTurn() async {
     var whoWon = gameEngine.api_check_who_won();
 
-    if (whoWon != PLAY) {
+    if (GameStatus.values[whoWon] != GameStatus.play) {
       log('whoWon (first): $whoWon');
       isPlay = false;
 
@@ -91,7 +92,7 @@ class _GameScreenState extends State<GameScreen> {
 
     setState(() {
       if (isPlay) {
-        final pickedNumber = gameEngine.api_think();
+        final pickedNumber = gameEngine.api_think(); // TODO (MC): UI is being blocked here
         log('Computer picked: $pickedNumber');
         gameEngine.api_move(pickedNumber);
         gameState.black.add(pickedNumber);
@@ -101,7 +102,7 @@ class _GameScreenState extends State<GameScreen> {
 
     whoWon = gameEngine.api_check_who_won();
 
-    if (whoWon != PLAY) {
+    if (GameStatus.values[whoWon] != GameStatus.play) {
       log('whoWon (second): $whoWon');
       isPlay = false;
 
@@ -113,14 +114,14 @@ class _GameScreenState extends State<GameScreen> {
   Future<void> displayWinnerDialog(int whoWon) async {
     var title = '';
     var content = '';
-    switch (whoWon) {
-      case WHITE:
+    switch (GameStatus.values[whoWon]) {
+      case GameStatus.white:
         title = 'Congratulations!';
         content = 'You won!';
-      case BLACK:
+      case GameStatus.black:
         title = 'Computer won!';
         content = 'You lost!';
-      case DRAW:
+      case GameStatus.draw:
         title = 'Hmmm';
         content = 'Draw';
       default:
@@ -207,6 +208,7 @@ class _GameScreenState extends State<GameScreen> {
                   selectedNumbers: gameState.black,
                   color: Colors.red,
                 ),
+                Text('Target sequence length: ${widget.sequenceLength}'),
               ],
             ),
           ),

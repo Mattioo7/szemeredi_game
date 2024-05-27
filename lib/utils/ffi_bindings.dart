@@ -20,120 +20,6 @@ class SzemerediGameEngine {
           lookup)
       : _lookup = lookup;
 
-  int init() {
-    return _init();
-  }
-
-  late final _initPtr = _lookup<ffi.NativeFunction<ffi.Int Function()>>('init');
-  late final _init = _initPtr.asFunction<int Function()>();
-
-  int finish() {
-    return _finish();
-  }
-
-  late final _finishPtr =
-      _lookup<ffi.NativeFunction<ffi.Int Function()>>('finish');
-  late final _finish = _finishPtr.asFunction<int Function()>();
-
-  int setup(
-    int arg0,
-    int arg1,
-    int arg2,
-  ) {
-    return _setup(
-      arg0,
-      arg1,
-      arg2,
-    );
-  }
-
-  late final _setupPtr =
-      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Int, ffi.Int, ffi.Int)>>(
-          'setup');
-  late final _setup = _setupPtr.asFunction<int Function(int, int, int)>();
-
-  int clean() {
-    return _clean();
-  }
-
-  late final _cleanPtr =
-      _lookup<ffi.NativeFunction<ffi.Int Function()>>('clean');
-  late final _clean = _cleanPtr.asFunction<int Function()>();
-
-  void set_state(
-    state arg0,
-  ) {
-    return _set_state(
-      arg0,
-    );
-  }
-
-  late final _set_statePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(state)>>('set_state');
-  late final _set_state = _set_statePtr.asFunction<void Function(state)>();
-
-  state get_state() {
-    return _get_state();
-  }
-
-  late final _get_statePtr =
-      _lookup<ffi.NativeFunction<state Function()>>('get_state');
-  late final _get_state = _get_statePtr.asFunction<state Function()>();
-
-  int move(
-    int arg0,
-  ) {
-    return _move(
-      arg0,
-    );
-  }
-
-  late final _movePtr =
-      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Int)>>('move');
-  late final _move = _movePtr.asFunction<int Function(int)>();
-
-  int check_who_won() {
-    return _check_who_won();
-  }
-
-  late final _check_who_wonPtr =
-      _lookup<ffi.NativeFunction<ffi.Int Function()>>('check_who_won');
-  late final _check_who_won = _check_who_wonPtr.asFunction<int Function()>();
-
-  int think() {
-    return _think();
-  }
-
-  late final _thinkPtr =
-      _lookup<ffi.NativeFunction<ffi.Int Function()>>('think');
-  late final _think = _thinkPtr.asFunction<int Function()>();
-
-  void print_state() {
-    return _print_state();
-  }
-
-  late final _print_statePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function()>>('print_state');
-  late final _print_state = _print_statePtr.asFunction<void Function()>();
-
-  void print_possible_moves() {
-    return _print_possible_moves();
-  }
-
-  late final _print_possible_movesPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function()>>('print_possible_moves');
-  late final _print_possible_moves =
-      _print_possible_movesPtr.asFunction<void Function()>();
-
-  void make_random_move() {
-    return _make_random_move();
-  }
-
-  late final _make_random_movePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function()>>('make_random_move');
-  late final _make_random_move =
-      _make_random_movePtr.asFunction<void Function()>();
-
   int api_init() {
     return _api_init();
   }
@@ -177,7 +63,7 @@ class SzemerediGameEngine {
   late final _api_clean = _api_cleanPtr.asFunction<int Function()>();
 
   void api_set_state(
-    state arg0,
+    ApiState arg0,
   ) {
     return _api_set_state(
       arg0,
@@ -185,17 +71,18 @@ class SzemerediGameEngine {
   }
 
   late final _api_set_statePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(state)>>('api_set_state');
+      _lookup<ffi.NativeFunction<ffi.Void Function(ApiState)>>('api_set_state');
   late final _api_set_state =
-      _api_set_statePtr.asFunction<void Function(state)>();
+      _api_set_statePtr.asFunction<void Function(ApiState)>();
 
-  state api_get_state() {
+  ApiState api_get_state() {
     return _api_get_state();
   }
 
   late final _api_get_statePtr =
-      _lookup<ffi.NativeFunction<state Function()>>('api_get_state');
-  late final _api_get_state = _api_get_statePtr.asFunction<state Function()>();
+      _lookup<ffi.NativeFunction<ApiState Function()>>('api_get_state');
+  late final _api_get_state =
+      _api_get_statePtr.asFunction<ApiState Function()>();
 
   int api_move(
     int arg0,
@@ -227,42 +114,18 @@ class SzemerediGameEngine {
   late final _api_think = _api_thinkPtr.asFunction<int Function()>();
 }
 
-final class state extends ffi.Struct {
-  @ffi.Array.multi([4])
-  external ffi.Array<U64> set1;
+final class ApiState_t extends ffi.Struct {
+  @ffi.UnsignedLongLong()
+  external int set1;
 
-  @ffi.Array.multi([4])
-  external ffi.Array<U64> white;
+  @ffi.UnsignedLongLong()
+  external int white;
 
-  @ffi.Array.multi([4])
-  external ffi.Array<U64> black;
+  @ffi.UnsignedLongLong()
+  external int black;
 
   @ffi.Int()
   external int to_move;
 }
 
-typedef U64 = ffi.UnsignedLongLong;
-typedef DartU64 = int;
-
-final class settings extends ffi.Struct {
-  @ffi.Int()
-  external int k;
-
-  @ffi.Int()
-  external int x;
-
-  @ffi.Int()
-  external int m;
-}
-
-const int MEM_SIZE = 4;
-
-const int MAX_NUMBER = 256;
-
-const int BLACK = 0;
-
-const int WHITE = 1;
-
-const int DRAW = 2;
-
-const int PLAY = 3;
+typedef ApiState = ApiState_t;
