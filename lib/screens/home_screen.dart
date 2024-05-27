@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:szemeredi_game/screens/game_screen.dart';
+import 'package:szemeredi_game/widgets/how_to_play_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -61,8 +62,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     keyboardType: TextInputType.number,
                     validator: (value) {
-                      if (int.tryParse(value ?? '') == null) {
+                      final number = int.tryParse(value ?? '');
+                      if (number == null) {
                         return 'Please enter a valid number';
+                      }
+                      if (number < 0 || number > 63) {
+                        return 'Please enter a number between 0 and 63';
                       }
                       return null;
                     },
@@ -75,8 +80,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     keyboardType: TextInputType.number,
                     validator: (value) {
-                      if (int.tryParse(value ?? '') == null) {
+                      final number = int.tryParse(value ?? '');
+                      if (number == null) {
                         return 'Please enter a valid number';
+                      }
+                      if (number < 0 || number > 63) {
+                        return 'Please enter a number between 0 and 63';
                       }
                       return null;
                     },
@@ -103,6 +112,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                     child: const Text('Start Game'),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton(
+                    onPressed: () {
+                      showDialog<HowToPlayDialog>(
+                        context: context,
+                        builder: (context) {
+                          return const HowToPlayDialog();
+                        },
+                      );
+                    },
+                    child: const Text('Jak grać?'),
                   ),
                 ],
               ),

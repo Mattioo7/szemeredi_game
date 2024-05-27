@@ -64,6 +64,7 @@ class _GameScreenState extends State<GameScreen> {
 
   bool isPlayerTurn = true;
   bool isPlay = true;
+  bool isLoading = false;
 
   Future<void> playerTurn(int number) async {
     setState(() {
@@ -87,16 +88,21 @@ class _GameScreenState extends State<GameScreen> {
       return;
     }
 
-    // TODO: delete
+    setState(() {
+      isLoading = true;
+    });
+
     await Future<void>.delayed(const Duration(seconds: 1));
 
     setState(() {
       if (isPlay) {
-        final pickedNumber = gameEngine.api_think(); // TODO (MC): UI is being blocked here
+        final pickedNumber =
+            gameEngine.api_think();
         log('Computer picked: $pickedNumber');
         gameEngine.api_move(pickedNumber);
         gameState.black.add(pickedNumber);
         isPlayerTurn = true;
+        isLoading = false;
       }
     });
 
@@ -196,8 +202,13 @@ class _GameScreenState extends State<GameScreen> {
           Expanded(
             flex: 2,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(
+                  height: 100,
+                  width: 100,
+                  child:
+                      isLoading ? const Center(child: Text('Computer is thinking...')) : null,
+                ),
                 PlayerInfo(
                   playerName: 'Player',
                   selectedNumbers: gameState.white,
